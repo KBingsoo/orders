@@ -21,16 +21,6 @@ func NewCardConsumer(conn *amqp.Connection) (*consumer, error) {
 	}, nil
 }
 
-func (c *consumer) Consume() error {
-	return c.internalConsumer.Consume(c.handler)
-}
-
-func (c *consumer) handler(entry event.Event) error {
-	switch entry.Type {
-	case event.Update:
-	default:
-		return nil
-	}
-
-	return nil
+func (c *consumer) Consume(fn func(event.Event) error) error {
+	return c.internalConsumer.Consume(fn)
 }

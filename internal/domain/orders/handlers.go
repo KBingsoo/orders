@@ -1,4 +1,4 @@
-package cards
+package orders
 
 import (
 	"encoding/json"
@@ -28,26 +28,15 @@ func NewHandler(manager *manager) *handler {
 }
 
 func (h *handler) init() {
-	h.router.Get("/cards", h.getCards)
-	h.router.Get("/cards/{id}", h.getCard)
-	h.router.Post("/cards", h.createCard)
+	h.router.Get("/{id}", h.getOrder)
+	h.router.Post("/", h.createOrder)
 }
 
 func (h *handler) Routes() *chi.Mux {
 	return h.router
 }
 
-func (h *handler) getCards(w http.ResponseWriter, r *http.Request) {
-	cards, err := h.manager.GetAll(r.Context())
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	render.JSON(w, r, cards)
-}
-
-func (h *handler) getCard(w http.ResponseWriter, r *http.Request) {
+func (h *handler) getOrder(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
 		http.Error(w, "id is required", http.StatusBadRequest)
@@ -63,23 +52,23 @@ func (h *handler) getCard(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, card)
 }
 
-func (h *handler) createCard(w http.ResponseWriter, r *http.Request) {
+func (h *handler) createOrder(w http.ResponseWriter, r *http.Request) {
 	b, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	card := new(models.Card)
-	if err := json.Unmarshal(b, card); err != nil {
+	order := new(models.Order)
+	if err := json.Unmarshal(b, order); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	if err := h.manager.Create(r.Context(), card); err != nil {
+	if err := h.manager.Create(r.Context(), order); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	render.JSON(w, r, card)
+	render.JSON(w, r, order)
 }

@@ -1,10 +1,16 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/KBingsoo/entities/pkg/models"
+	"github.com/KBingsoo/orders/internal/domain/orders"
 	"github.com/KBingsoo/orders/internal/gateways/database"
+	"github.com/KBingsoo/orders/internal/gateways/pubsub"
+	"github.com/KBingsoo/orders/internal/gateways/web"
 	"github.com/joho/godotenv"
 	"github.com/literalog/go-wise/wise"
+	"github.com/streadway/amqp"
 
 	"github.com/spf13/cobra"
 )
@@ -24,10 +30,42 @@ var serverCmd = &cobra.Command{
 			return err
 		}
 
-		_, err = wise.NewMongoSimpleRepository[models.Order](col)
+		repository, err := wise.NewMongoSimpleRepository[models.Order](col)
 		if err != nil {
 			return err
 		}
+
+		connection, err := amqp.Dial(os.Getenv("RABBIT_URL"))
+		if err != nil {
+			return err
+		}
+		defer connection.Close()
+
+		consumer, err := pubsub.NewCardConsumer(connection)
+		if err != nil {
+			return err
+		}
+
+		producer, err := pubsub.NewCardProducer(connection)
+		if err != nil {
+			return err
+		}
+
+		service := orders.NewManager(repository, producer, consumer)
+
+		handler := orders.NewHandler(service)
+
+		server := web.NewServer(handler)
+
+		errCh := make(chan error)
+
+		go func() {
+			errCh <- server.Run(8080)
+		}()
+
+		go func() {
+			errCh <- service.Consume()
+		}()
 
 		return nil
 	},

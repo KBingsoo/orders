@@ -28,7 +28,7 @@ func NewServer(cardsHadler Handler) *server {
 }
 
 func (s *server) Init() {
-	s.router.Mount("/cards", s.handler.Routes())
+	s.router.Mount("/orders", s.handler.Routes())
 }
 
 func (s *server) Close() {
