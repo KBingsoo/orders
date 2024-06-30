@@ -3,13 +3,18 @@ package pubsub
 import (
 	"encoding/json"
 
-	"github.com/KBingsoo/cards/pkg/models/event"
+	card "github.com/KBingsoo/cards/pkg/models/event"
+	"github.com/KBingsoo/orders/pkg/models/event"
 )
 
-func decode(data []byte) (event.Event, error) {
-	e := new(event.Event)
+type dataTypes interface {
+	card.Event | event.Event
+}
+
+func decode[T dataTypes](data []byte) (T, error) {
+	e := new(T)
 	if err := json.Unmarshal(data, e); err != nil {
-		return event.Event{}, err
+		return *e, err
 	}
 
 	return *e, nil

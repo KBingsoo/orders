@@ -4,7 +4,7 @@ go 1.22.2
 
 require (
 	github.com/KBingsoo/cards v0.0.0-20240626000606-e669995318ad
-	github.com/KBingsoo/entities v0.0.0-20240624231631-d6d633bf4142
+	github.com/KBingsoo/entities v0.0.0-20240630221807-50931a2f20ef
 	github.com/go-chi/chi/v5 v5.0.14
 	github.com/go-chi/render v1.0.3
 	github.com/google/uuid v1.6.0

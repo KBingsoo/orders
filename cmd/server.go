@@ -41,17 +41,27 @@ var serverCmd = &cobra.Command{
 		}
 		defer connection.Close()
 
-		consumer, err := pubsub.NewCardConsumer(connection)
+		cardConsumer, err := pubsub.NewCardConsumer(connection)
 		if err != nil {
 			return err
 		}
 
-		producer, err := pubsub.NewCardProducer(connection)
+		cardProducer, err := pubsub.NewCardProducer(connection)
 		if err != nil {
 			return err
 		}
 
-		service := orders.NewManager(repository, producer, consumer)
+		consumer, err := pubsub.NewConsumer(connection)
+		if err != nil {
+			return err
+		}
+
+		producer, err := pubsub.NewProducer(connection)
+		if err != nil {
+			return err
+		}
+
+		service := orders.NewManager(repository, cardProducer, cardConsumer, producer, consumer)
 
 		handler := orders.NewHandler(service)
 

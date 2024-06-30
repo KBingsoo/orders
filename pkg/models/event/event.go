@@ -10,9 +10,10 @@ import (
 type EventType string
 
 const (
-	Create EventType = "order_create"
-	Update EventType = "order_update"
-	Delete EventType = "order_delete"
+	Create  EventType = "order_create"
+	Update  EventType = "order_update"
+	Delete  EventType = "order_delete"
+	Fulfill EventType = "order_fulfill"
 
 	Succeed EventType = "order_succeed"
 	Error   EventType = "order_error"

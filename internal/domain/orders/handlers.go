@@ -29,6 +29,7 @@ func NewHandler(manager *manager) *handler {
 
 func (h *handler) init() {
 	h.router.Get("/{id}", h.getOrder)
+	h.router.Patch("/{id}/ship", h.shipOrder)
 	h.router.Post("/", h.createOrder)
 }
 
@@ -71,4 +72,19 @@ func (h *handler) createOrder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.JSON(w, r, order)
+}
+
+func (h *handler) shipOrder(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	if id == "" {
+		http.Error(w, "id is required", http.StatusBadRequest)
+		return
+	}
+
+	if err := h.manager.ConfirmShipment(r.Context(), id); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }

@@ -8,6 +8,8 @@ github.com/KBingsoo/cards v0.0.0-20240626000606-e669995318ad h1:bBGV4rTHyjkbWgqt
 github.com/KBingsoo/cards v0.0.0-20240626000606-e669995318ad/go.mod h1:lIxdFk6QJfeiX5JEob78FF9J+C4c2bMh8zCLAbRiuHc=
 github.com/KBingsoo/entities v0.0.0-20240624231631-d6d633bf4142 h1:LymeJ4fK36S4BQCP4J1ouIbl/riq+SHujkxMdhdpslQ=
 github.com/KBingsoo/entities v0.0.0-20240624231631-d6d633bf4142/go.mod h1:yZr8KGzDslRW/cQF0Ru3VI8MIdx1Ilmsirdcxb88md4=
+github.com/KBingsoo/entities v0.0.0-20240630221807-50931a2f20ef h1:RnzNKKDW/iPj5Vxtlv9XqGtlon47ia/hVN5+sH0mDag=
+github.com/KBingsoo/entities v0.0.0-20240630221807-50931a2f20ef/go.mod h1:yZr8KGzDslRW/cQF0Ru3VI8MIdx1Ilmsirdcxb88md4=
 github.com/ajg/form v1.5.1 h1:t9c7v8JUKu/XxOGBU0yjNpaMloxGEJhUkqFRq0ibGeU=
 github.com/ajg/form v1.5.1/go.mod h1:uL1WgH+h2mgNtvBq0339dVnzXdBETtL2LeUXaIv25UY=
 github.com/bits-and-blooms/bitset v1.10.0 h1:ePXTeiPEazB5+opbv5fr8umg2R/1NlzgDsyepwsSr88=
