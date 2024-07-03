@@ -6,7 +6,6 @@ import (
 
 	cards "github.com/KBingsoo/cards/pkg/models/event"
 	"github.com/KBingsoo/entities/pkg/models"
-	"github.com/KBingsoo/orders/pkg/models/event"
 	"github.com/google/uuid"
 )
 
@@ -27,18 +26,14 @@ type manager struct {
 	repository   Repository
 	cardProducer CardProducer
 	cardConsumer CardConsumer
-	producer     Producer
-	consumer     Consumer
 	orderMap     map[string]itemsMap
 }
 
-func NewManager(repository Repository, cardProducer CardProducer, cardConsumer CardConsumer, producer Producer, consumer Consumer) *manager {
+func NewManager(repository Repository, cardProducer CardProducer, cardConsumer CardConsumer) *manager {
 	return &manager{
 		repository:   repository,
 		cardProducer: cardProducer,
 		cardConsumer: cardConsumer,
-		consumer:     consumer,
-		producer:     producer,
 		orderMap:     make(map[string]itemsMap),
 	}
 }
@@ -100,20 +95,10 @@ func (m *manager) Fulfill(ctx context.Context, orderID string) error {
 }
 
 func (m *manager) revert(ctx context.Context, orderID string) error {
-	err := m.cardProducer.Emit(cards.Event{
+	return m.cardProducer.Emit(cards.Event{
 		Type:    cards.OrderRevert,
 		Time:    time.Now(),
 		OrderID: orderID,
-		Context: ctx,
-	})
-	if err != nil {
-		return err
-	}
-
-	return m.producer.Emit(event.Event{
-		Type:    event.Error,
-		Time:    time.Now(),
-		Order:   m.orderMap[orderID].order,
 		Context: ctx,
 	})
 }
@@ -137,12 +122,6 @@ func (m *manager) cardHandler(entry cards.Event) error {
 				return err
 			}
 			delete(m.orderMap, entry.OrderID)
-			m.producer.Emit(event.Event{
-				Type:    event.Succeed,
-				Time:    time.Now(),
-				Order:   order.order,
-				Context: entry.Context,
-			})
 		}
 
 	case cards.Error:
@@ -157,22 +136,6 @@ func (m *manager) cardHandler(entry cards.Event) error {
 	return nil
 }
 
-func (m *manager) handler(entry event.Event) error {
-	switch entry.Type {
-	case event.Create:
-		return m.Create(entry.Context, &entry.Order)
-	case event.Fulfill:
-		return m.Fulfill(entry.Context, entry.Order.ID)
-	}
-
-	return nil
-}
-
 func (m *manager) Consume() error {
-	err := m.cardConsumer.Consume(m.cardHandler)
-	if err != nil {
-		return err
-	}
-
-	return m.consumer.Consume(m.handler)
+	return m.cardConsumer.Consume(m.cardHandler)
 }

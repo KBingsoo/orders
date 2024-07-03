@@ -35,7 +35,7 @@ var serverCmd = &cobra.Command{
 			return err
 		}
 
-		connection, err := amqp.Dial(os.Getenv("RABBIT_URL"))
+		connection, err := amqp.Dial(os.Getenv("RABBIT_URI"))
 		if err != nil {
 			return err
 		}
@@ -51,17 +51,7 @@ var serverCmd = &cobra.Command{
 			return err
 		}
 
-		consumer, err := pubsub.NewConsumer(connection)
-		if err != nil {
-			return err
-		}
-
-		producer, err := pubsub.NewProducer(connection)
-		if err != nil {
-			return err
-		}
-
-		service := orders.NewManager(repository, cardProducer, cardConsumer, producer, consumer)
+		service := orders.NewManager(repository, cardProducer, cardConsumer)
 
 		handler := orders.NewHandler(service)
 
@@ -77,7 +67,8 @@ var serverCmd = &cobra.Command{
 			errCh <- service.Consume()
 		}()
 
-		return nil
+		return <-errCh
+
 	},
 }
 
